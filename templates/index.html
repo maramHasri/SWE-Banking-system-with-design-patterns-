@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Banking System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to the Banking System</h2>
+    <p>Please select your role to continue:</p>
+    
+    <div class="grid" style="margin-top: 30px;">
+        <div class="stat-card">
+            <h3>🏧 ATM / Financial Services</h3>
+          
+            </ul>
+            <a href="{{ url_for('client.access') }}" class="btn" style="margin-top: 15px; display: inline-block;">Access ATM</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>👔 Employee</h3>
+            <a href="{{ url_for('login') }}?role=employee" class="btn" style="margin-top: 15px; display: inline-block;">Login as Employee</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>👑 Admin</h3>
+            <p>Login for full access</p>
+            <a href="{{ url_for('login') }}?role=admin" class="btn" style="margin-top: 15px; display: inline-block;">Login as Admin</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

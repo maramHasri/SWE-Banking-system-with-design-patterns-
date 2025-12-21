@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Create Customer Account{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Create New Customer Account</h2>
+    <p style="color: #6c757d; margin-bottom: 20px;">
+        Create an account for an existing customer or create a new customer account. 
+        If the customer doesn't exist, a new customer will be created automatically.
+    </p>
+    <form method="POST" action="{{ url_for('employee.create_account') }}">
+        <div class="form-group">
+            <label for="owner_id">Customer Username <span style="color: red;">*</span>:</label>
+            <input type="text" name="owner_id" id="owner_id" 
+                   placeholder="Enter customer username (e.g., ahmad_mohsen)" required>
+            <small style="color: #6c757d;">
+                Enter existing customer username, or a new username to create a new customer
+            </small>
+        </div>
+        
+        <div class="form-group" id="new_customer_fields" style="display: none;">
+            <div style="background-color: #e7f3ff; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <strong style="color: #0066cc;">New Customer Information (Optional)</strong>
+                <p style="color: #6c757d; margin: 5px 0; font-size: 0.9em;">
+                    These fields are optional. Fill them if creating a new customer.
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label for="customer_email">Customer Email (Optional):</label>
+                <input type="email" name="customer_email" id="customer_email" 
+                       placeholder="customer@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="customer_phone">Customer Phone (Optional):</label>
+                <input type="text" name="customer_phone" id="customer_phone" 
+                       placeholder="+1234567890">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="account_type">Account Type <span style="color: red;">*</span>:</label>
+            <select name="account_type" id="account_type" required>
+                <option value="">Select account type...</option>
+                {% for account_type in account_types %}
+                <option value="{{ account_type.value }}">{{ account_type.value.title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="initial_balance">Initial Balance:</label>
+            <input type="number" name="initial_balance" id="initial_balance" 
+                   value="0" min="0" step="0.01" required>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Create Account</button>
+        <a href="{{ url_for('employee.view_accounts') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+// Show optional customer fields when username is entered
+document.getElementById('owner_id').addEventListener('input', function() {
+    var username = this.value.trim();
+    var newCustomerFields = document.getElementById('new_customer_fields');
+    if (username.length > 0) {
+        newCustomerFields.style.display = 'block';
+    } else {
+        newCustomerFields.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
+

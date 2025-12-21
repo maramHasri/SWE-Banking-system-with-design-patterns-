@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Banking System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Login as {{ request.args.get('role', 'User').title() }}</h2>
+    {% if request.args.get('role') == 'employee' or request.args.get('role') == 'admin' %}
+    <p style="color: #6c757d; margin-bottom: 20px;">
+        Enter your credentials to access the system
+    </p>
+    <form method="POST" action="{{ url_for('login', role=request.args.get('role')) }}">
+        <input type="hidden" name="role" value="{{ request.args.get('role', '') }}">
+        
+        <div class="form-group">
+            <label for="username">Username <span style="color: red;">*</span>:</label>
+            <input type="text" name="username" id="username" placeholder="Enter username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email_or_phone">Email or Phone Number <span style="color: red;">*</span>:</label>
+            <input type="text" name="email_or_phone" id="email_or_phone" 
+                   placeholder="Enter email or phone number" required>
+            <small style="color: #6c757d;">Use the email or phone number associated with your account</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password <span style="color: red;">*</span>:</label>
+            <input type="password" name="password" id="password" placeholder="Enter password" required>
+        </div>
+        
+        <button type="submit" class="btn">Login</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+    {% else %}
+    <p style="color: #6c757d; margin-bottom: 20px;">
+        Enter your username to continue
+    </p>
+    <form method="POST" action="{{ url_for('login', role=request.args.get('role')) }}">
+        <input type="hidden" name="role" value="{{ request.args.get('role', '') }}">
+        
+        <div class="form-group">
+            <label for="username">Username <span style="color: red;">*</span>:</label>
+            <input type="text" name="username" id="username" placeholder="Enter username" required>
+        </div>
+        
+        <button type="submit" class="btn">Login</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+

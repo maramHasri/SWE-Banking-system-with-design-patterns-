@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Make Transaction{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Make a Transaction</h2>
+    <form method="POST" action="{{ url_for('customer.transaction') }}">
+        <div class="form-group">
+            <label for="transaction_type">Transaction Type:</label>
+            <select name="transaction_type" id="transaction_type" required onchange="toggleTargetAccount()">
+                <option value="">Select transaction type...</option>
+                <option value="deposit">Deposit</option>
+                <option value="withdrawal">Withdrawal</option>
+                <option value="transfer">Transfer</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="account_id">From Account:</label>
+            <select name="account_id" id="account_id" required>
+                <option value="">Select account...</option>
+                {% for account in accounts %}
+                <option value="{{ account.account_id }}">
+                    {{ account.account_id }} - {{ account.account_type.value.title() }} 
+                    (Balance: ${{ "%.2f"|format(account.balance) }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group" id="target_account_group" style="display: none;">
+            <label for="target_account_id">To Account:</label>
+            <select name="target_account_id" id="target_account_id">
+                <option value="">Select target account...</option>
+                {% for account in all_accounts %}
+                <option value="{{ account.account_id }}">
+                    {{ account.account_id }} - {{ account.account_type.value.title() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">Amount:</label>
+            <input type="number" name="amount" id="amount" 
+                   min="0.01" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description (optional):</label>
+            <textarea name="description" id="description" rows="3"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Submit Transaction</button>
+        <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+function toggleTargetAccount() {
+    const transactionType = document.getElementById('transaction_type').value;
+    const targetAccountGroup = document.getElementById('target_account_group');
+    const targetAccount = document.getElementById('target_account_id');
+    
+    if (transactionType === 'transfer') {
+        targetAccountGroup.style.display = 'block';
+        targetAccount.required = true;
+    } else {
+        targetAccountGroup.style.display = 'none';
+        targetAccount.required = false;
+    }
+}
+</script>
+{% endblock %}
+

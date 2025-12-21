@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Database Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📊 Database Dashboard - System Overview</h2>
+    <p style="color: #6c757d; margin-bottom: 20px;">
+        Complete view of all accounts, transactions, and system data
+    </p>
+    
+    <!-- Statistics Overview -->
+    <div class="grid" style="margin-bottom: 30px;">
+        <div class="stat-card">
+            <h3>{{ total_accounts }}</h3>
+            <p>Total Accounts</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_transactions }}</h3>
+            <p>Total Transactions</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(total_balance) }}</h3>
+            <p>Total Balance</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(total_deposits) }}</h3>
+            <p>Total Deposits</p>
+        </div>
+    </div>
+    
+    <!-- Account Type Distribution -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>Account Type Distribution</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Account Type</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for acc_type, count in account_type_count.items() %}
+                <tr>
+                    <td>{{ acc_type.title() }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- State Distribution -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>Account State Distribution</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for state, count in state_count.items() %}
+                <tr>
+                    <td>{{ state }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- All Accounts -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>All Accounts ({{ all_accounts|length }})</h2>
+        {% if all_accounts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Account ID</th>
+                    <th>Type</th>
+                    <th>Owner ID</th>
+                    <th>Balance</th>
+                    <th>State</th>
+                    <th>Parent Account</th>
+                    <th>Created</th>
+                    <th>Closed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in all_accounts %}
+                <tr>
+                    <td><strong>{{ account.account_id }}</strong></td>
+                    <td>{{ account.account_type.value.title() }}</td>
+                    <td>{{ account.owner_id }}</td>
+                    <td>${{ "%.2f"|format(account.balance) }}</td>
+                    <td>
+                        <span style="padding: 5px 10px; border-radius: 3px; 
+                            {% if account.get_state_name() == 'Active' %}background: #d4edda; color: #155724;
+                            {% elif account.get_state_name() == 'Frozen' %}background: #fff3cd; color: #856404;
+                            {% elif account.get_state_name() == 'Suspended' %}background: #f8d7da; color: #721c24;
+                            {% else %}background: #d1ecf1; color: #0c5460;{% endif %}">
+                            {{ account.get_state_name() }}
+                        </span>
+                    </td>
+                    <td>{{ account.parent_account_id or 'N/A' }}</td>
+                    <td>{{ account.created_at.strftime('%Y-%m-%d') if account.created_at else 'N/A' }}</td>
+                    <td>{{ 'Yes' if account.is_closed else 'No' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No accounts found.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Accounts by Owner -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>Accounts by Owner</h2>
+        {% if accounts_by_owner %}
+        {% for owner_id, accounts in accounts_by_owner.items() %}
+        <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+            <h3 style="color: #667eea; margin-bottom: 10px;">Owner: {{ owner_id }} ({{ accounts|length }} account(s))</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Type</th>
+                        <th>Balance</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in accounts %}
+                    <tr>
+                        <td>{{ account.account_id }}</td>
+                        <td>{{ account.account_type.value.title() }}</td>
+                        <td>${{ "%.2f"|format(account.balance) }}</td>
+                        <td>{{ account.get_state_name() }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No accounts found.</p>
+        {% endif %}
+    </div>
+    
+    <!-- All Transactions -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>All Transactions ({{ all_transactions|length }})</h2>
+        {% if all_transactions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>From Account</th>
+                    <th>To Account</th>
+                    <th>Status</th>
+                    <th>Approved By</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in all_transactions %}
+                <tr>
+                    <td><strong>{{ transaction.transaction_id }}</strong></td>
+                    <td>{{ transaction.transaction_type.value.title() }}</td>
+                    <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                    <td>{{ transaction.account_id }}</td>
+                    <td>{{ transaction.target_account_id or 'N/A' }}</td>
+                    <td>
+                        <span style="padding: 5px 10px; border-radius: 3px;
+                            {% if transaction.status.value == 'completed' %}background: #d4edda; color: #155724;
+                            {% elif transaction.status.value == 'pending' %}background: #fff3cd; color: #856404;
+                            {% elif transaction.status.value == 'approved' %}background: #d1ecf1; color: #0c5460;
+                            {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                            {{ transaction.status.value.title() }}
+                        </span>
+                    </td>
+                    <td>{{ transaction.approved_by or 'N/A' }}</td>
+                    <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M:%S') if transaction.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No transactions found.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Transactions by Account -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>Transactions by Account</h2>
+        {% if transactions_by_account %}
+        {% for account_id, transactions in transactions_by_account.items() %}
+        <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+            <h3 style="color: #667eea; margin-bottom: 10px;">Account: {{ account_id }} ({{ transactions|length }} transaction(s))</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.transaction_id }}</td>
+                        <td>{{ transaction.transaction_type.value.title() }}</td>
+                        <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                        <td>{{ transaction.status.value.title() }}</td>
+                        <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') if transaction.created_at else 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No transactions found.</p>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #dee2e6;">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn">Back to Admin Dashboard</a>
+        <a href="{{ url_for('admin.database_dashboard') }}" class="btn btn-secondary" onclick="location.reload();">Refresh Data</a>
+    </div>
+</div>
+{% endblock %}
+

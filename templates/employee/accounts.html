@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}All Accounts{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>All Accounts</h2>
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('employee.create_account') }}" class="btn btn-success">Create New Customer Account</a>
+    </div>
+    {% if accounts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Account ID</th>
+                    <th>IBAN</th>
+                    <th>Type</th>
+                    <th>Owner</th>
+                    <th>Balance</th>
+                    <th>State</th>
+                    <th>Change State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td><strong>{{ account.account_id }}</strong></td>
+                    <td>
+                        {% if account.iban %}
+                            <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 3px; font-size: 0.9em;">{{ account.iban }}</code>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ account.account_type.value.title() }}</td>
+                    <td>{{ account.owner_id }}</td>
+                    <td>${{ "%.2f"|format(account.balance) }}</td>
+                    <td>{{ account.get_state_name() }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('employee.change_account_state', account_id=account.account_id) }}" style="display: inline;">
+                            <select name="state" style="padding: 5px; margin-right: 5px;">
+                                <option value="active">Active</option>
+                                <option value="frozen">Frozen</option>
+                                <option value="suspended">Suspended</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                            <button type="submit" class="btn btn-success">Change</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No accounts found.</p>
+    {% endif %}
+    
+    <a href="{{ url_for('employee.dashboard') }}" class="btn" style="margin-top: 20px;">Back to Dashboard</a>
+</div>
+{% endblock %}
+

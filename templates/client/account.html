@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Account: {{ account.account_id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Account: {{ account.account_id }}</h2>
+    
+    {% if authenticated_account_id %}
+    <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        ✅ Authenticated Account: You are logged in to this account. You can perform all transactions (deposit, withdrawal, transfer).
+        <a href="{{ url_for('client.logout') }}" style="float: right; color: #155724; text-decoration: underline;">Logout</a>
+    </div>
+    {% else %}
+    <div style="background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        ⚠️ You must login with your Account ID and IBAN to access this account.
+        <a href="{{ url_for('client.access') }}" style="color: #667eea; text-decoration: underline;">Login here</a>
+    </div>
+    {% endif %}
+    
+    {% if account.iban %}
+    <div style="background-color: #e7f3ff; color: #0066cc; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        <strong>IBAN:</strong> {{ account.iban }}
+    </div>
+    {% endif %}
+    
+    <div class="grid" style="margin-top: 20px;">
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(account.balance) }}</h3>
+            <p>Current Balance</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ account.account_type.value.title() }}</h3>
+            <p>Account Type</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ account.get_state_name() }}</h3>
+            <p>Account State</p>
+        </div>
+    </div>
+</div>
+
+{% if user_id and user_accounts %}
+<div class="card" style="margin-top: 20px;">
+    <h2>Your Accounts</h2>
+    <p style="color: #6c757d; margin-bottom: 15px;">Click on any account to access it:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Account ID</th>
+                <th>Type</th>
+                <th>Balance</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for acc in user_accounts %}
+            <tr>
+                <td>{{ acc.account_id }}</td>
+                <td>{{ acc.account_type.value.title() }}</td>
+                <td>${{ "%.2f"|format(acc.balance) }}</td>
+                <td>
+                    <a href="{{ url_for('client.account_view', account_id=acc.account_id) }}" class="btn btn-sm">Access</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="margin-top: 15px;">
+        <a href="{{ url_for('customer.dashboard') }}" class="btn">Go to Customer Dashboard</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top: 20px;">
+    <h2>Perform Transaction</h2>
+    <form method="POST" action="{{ url_for('client.transaction') }}">
+        <input type="hidden" name="account_id" value="{{ account.account_id }}">
+        
+        <div class="form-group">
+            <label for="transaction_type">Transaction Type:</label>
+            <select name="transaction_type" id="transaction_type" required onchange="toggleTargetAccount()">
+                <option value="">Select transaction type...</option>
+                <option value="deposit">Deposit</option>
+                <option value="withdrawal">Withdrawal</option>
+                <option value="transfer">Transfer</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="target_account_group" style="display: none;">
+            <label for="target_account_id">To Account Number:</label>
+            <input type="text" name="target_account_id" id="target_account_id" 
+                   placeholder="e.g., ACC_87654321" 
+                   pattern="ACC_[A-Z0-9]+">
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">Amount ($):</label>
+            <input type="number" name="amount" id="amount" 
+                   min="0.01" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description (optional):</label>
+            <textarea name="description" id="description" rows="3"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Submit Transaction</button>
+        {% if authenticated_account_id %}
+        <a href="{{ url_for('client.logout') }}" class="btn btn-secondary">Logout</a>
+        {% else %}
+        <a href="{{ url_for('client.access') }}" class="btn btn-secondary">Back</a>
+        {% endif %}
+    </form>
+</div>
+
+{% if transactions %}
+<div class="card" style="margin-top: 20px;">
+    <h2>Recent Transactions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.transaction_id }}</td>
+                <td>{{ transaction.transaction_type.value.title() }}</td>
+                <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                <td>
+                    {% if transaction.status.value %}
+                        {% set status_value = transaction.status.value %}
+                    {% else %}
+                        {% set status_value = transaction.status %}
+                    {% endif %}
+                    {% if status_value == 'completed' %}
+                        {% set status_style = 'background: #d4edda; color: #155724;' %}
+                    {% elif status_value == 'pending' %}
+                        {% set status_style = 'background: #fff3cd; color: #856404;' %}
+                    {% elif status_value == 'approved' %}
+                        {% set status_style = 'background: #d1ecf1; color: #0c5460;' %}
+                    {% else %}
+                        {% set status_style = 'background: #f8d7da; color: #721c24;' %}
+                    {% endif %}
+                  
+                </td>
+                <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') if transaction.created_at else 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<script>
+function toggleTargetAccount() {
+    const transactionType = document.getElementById('transaction_type').value;
+    const targetAccountGroup = document.getElementById('target_account_group');
+    const targetAccount = document.getElementById('target_account_id');
+    
+    if (transactionType === 'transfer') {
+        targetAccountGroup.style.display = 'block';
+        targetAccount.required = true;
+    } else {
+        targetAccountGroup.style.display = 'none';
+        targetAccount.required = false;
+    }
+}
+</script>
+{% endblock %}
+

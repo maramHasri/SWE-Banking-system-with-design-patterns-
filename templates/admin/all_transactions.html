@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}All Transactions{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>All Transactions</h2>
+    {% if transactions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>From Account</th>
+                    <th>To Account</th>
+                    <th>Status</th>
+                    <th>Approved By</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.transaction_id }}</td>
+                    <td>{{ transaction.transaction_type.value.title() }}</td>
+                    <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                    <td>{{ transaction.account_id }}</td>
+                    <td>{{ transaction.target_account_id or 'N/A' }}</td>
+                    <td>{{ transaction.status.value.title() }}</td>
+                    <td>{{ transaction.approved_by or 'N/A' }}</td>
+                    <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') if transaction.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No transactions found.</p>
+    {% endif %}
+    
+    <a href="{{ url_for('admin.dashboard') }}" class="btn" style="margin-top: 20px;">Back to Dashboard</a>
+</div>
+{% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid">
+    <div class="card">
+        <h2>Pending High-Value Approvals</h2>
+        {% if pending_approvals %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Account</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in pending_approvals %}
+                    <tr>
+                        <td>{{ transaction.transaction_id }}</td>
+                        <td>{{ transaction.transaction_type.value.title() }}</td>
+                        <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                        <td>{{ transaction.account_id }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin.approve_transaction', transaction_id=transaction.transaction_id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No pending approvals.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Financial Summary</h2>
+        <div class="stat-card" style="margin-top: 15px;">
+            <h3>${{ "%.2f"|format(financial_summary.retained_earnings) }}</h3>
+            <p>Retained Earnings</p>
+        </div>
+        <p><strong>Total Deposits:</strong> ${{ "%.2f"|format(financial_summary.total_deposits) }}</p>
+        <p><strong>Total Loans:</strong> ${{ "%.2f"|format(financial_summary.total_loans) }}</p>
+        <p><strong>Total Accounts:</strong> {{ financial_summary.total_accounts }}</p>
+        <p><strong>Active Accounts:</strong> {{ financial_summary.active_accounts }}</p>
+        <a href="{{ url_for('admin.financials') }}" class="btn" style="margin-top: 15px;">View Full Financials</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+    <h2>Daily Transaction Summary</h2>
+    <p><strong>Date:</strong> {{ daily_report.date }}</p>
+    <p><strong>Total Transactions:</strong> {{ daily_report.total_transactions }}</p>
+    <p><strong>Total Deposits:</strong> ${{ "%.2f"|format(daily_report.total_deposits) }}</p>
+    <p><strong>Total Withdrawals:</strong> ${{ "%.2f"|format(daily_report.total_withdrawals) }}</p>
+</div>
+{% endblock %}
+

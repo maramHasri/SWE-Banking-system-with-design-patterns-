@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>My Accounts</h2>
+    {% if accounts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Account ID</th>
+                    <th>IBAN</th>
+                    <th>Type</th>
+                    <th>Balance</th>
+                    <th>State</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td><strong>{{ account.account_id }}</strong></td>
+                    <td>
+                        {% if account.iban %}
+                            <code style="background: #e7f3ff; padding: 4px 8px; border-radius: 3px; font-size: 0.9em; color: #0066cc;">{{ account.iban }}</code>
+                            <br><small style="color: #6c757d;">Use this IBAN with Account ID to login</small>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ account.account_type.value.title() }}</td>
+                    <td>${{ "%.2f"|format(account.balance) }}</td>
+                    <td>{{ account.get_state_name() }}</td>
+                    <td>{{ account.created_at.strftime('%Y-%m-%d') if account.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You don't have any accounts yet. Please contact an employee to create an account for you.</p>
+    {% endif %}
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('customer.transaction') }}" class="btn btn-success">Make Transaction</a>
+    </div>
+</div>
+
+{% if notifications %}
+<div class="card">
+    <h2>Recent Notifications</h2>
+    <ul>
+        {% for notification in notifications %}
+        <li style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+            <strong>{{ notification.data.message }}</strong><br>
+            <small>{{ notification.timestamp }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('customer.notifications') }}" class="btn">View All Notifications</a>
+</div>
+{% endif %}
+{% endblock %}
+

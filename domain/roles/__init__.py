@@ -1,0 +1,2 @@
+"""Role definitions for RBAC"""
+

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Reports{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Daily Transaction Report - {{ report.date }}</h2>
+    
+    <div class="grid">
+        <div class="stat-card">
+            <h3>{{ report.total_transactions }}</h3>
+            <p>Total Transactions</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(report.total_deposits) }}</h3>
+            <p>Total Deposits</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(report.total_withdrawals) }}</h3>
+            <p>Total Withdrawals</p>
+        </div>
+        <div class="stat-card">
+            <h3>${{ "%.2f"|format(report.total_transfers) }}</h3>
+            <p>Total Transfers</p>
+        </div>
+    </div>
+    
+    {% if report.transactions %}
+    <h3 style="margin-top: 30px;">Transaction Details</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Account</th>
+                <th>Status</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in report.transactions %}
+            <tr>
+                <td>{{ transaction.transaction_id }}</td>
+                <td>{{ transaction.transaction_type.title() }}</td>
+                <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                <td>{{ transaction.account_id }}</td>
+                <td>{{ transaction.status.title() }}</td>
+                <td>{{ transaction.created_at[:19] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <a href="{{ url_for('employee.dashboard') }}" class="btn" style="margin-top: 20px;">Back to Dashboard</a>
+</div>
+{% endblock %}
+
