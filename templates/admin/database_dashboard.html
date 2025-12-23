@@ -2,6 +2,33 @@
 
 {% block title %}Database Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-weight: 500;
+        display: inline-block;
+    }
+    .status-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .status-approved {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="card">
     <h2>📊 Database Dashboard - System Overview</h2>
@@ -96,13 +123,17 @@
                     <td>{{ account.owner_id }}</td>
                     <td>${{ "%.2f"|format(account.balance) }}</td>
                     <td>
-                        <span style="padding: 5px 10px; border-radius: 3px; 
-                            {% if account.get_state_name() == 'Active' %}background: #d4edda; color: #155724;
-                            {% elif account.get_state_name() == 'Frozen' %}background: #fff3cd; color: #856404;
-                            {% elif account.get_state_name() == 'Suspended' %}background: #f8d7da; color: #721c24;
-                            {% else %}background: #d1ecf1; color: #0c5460;{% endif %}">
-                            {{ account.get_state_name() }}
-                        </span>
+                        {% set state_name = account.get_state_name() %}
+                        {% if state_name == 'Active' %}
+                            {% set state_class = 'status-badge status-completed' %}
+                        {% elif state_name == 'Frozen' %}
+                            {% set state_class = 'status-badge status-pending' %}
+                        {% elif state_name == 'Suspended' %}
+                            {% set state_class = 'status-badge status-rejected' %}
+                        {% else %}
+                            {% set state_class = 'status-badge status-approved' %}
+                        {% endif %}
+                        <span class="{{ state_class }}">{{ account.get_state_name() }}</span>
                     </td>
                     <td>{{ account.parent_account_id or 'N/A' }}</td>
                     <td>{{ account.created_at.strftime('%Y-%m-%d') if account.created_at else 'N/A' }}</td>
@@ -176,13 +207,17 @@
                     <td>{{ transaction.account_id }}</td>
                     <td>{{ transaction.target_account_id or 'N/A' }}</td>
                     <td>
-                        <span style="padding: 5px 10px; border-radius: 3px;
-                            {% if transaction.status.value == 'completed' %}background: #d4edda; color: #155724;
-                            {% elif transaction.status.value == 'pending' %}background: #fff3cd; color: #856404;
-                            {% elif transaction.status.value == 'approved' %}background: #d1ecf1; color: #0c5460;
-                            {% else %}background: #f8d7da; color: #721c24;{% endif %}">
-                            {{ transaction.status.value.title() }}
-                        </span>
+                        {% set status_value = transaction.status.value %}
+                        {% if status_value == 'completed' %}
+                            {% set status_class = 'status-badge status-completed' %}
+                        {% elif status_value == 'pending' %}
+                            {% set status_class = 'status-badge status-pending' %}
+                        {% elif status_value == 'approved' %}
+                            {% set status_class = 'status-badge status-approved' %}
+                        {% else %}
+                            {% set status_class = 'status-badge status-rejected' %}
+                        {% endif %}
+                        <span class="{{ status_class }}">{{ transaction.status.value.title() }}</span>
                     </td>
                     <td>{{ transaction.approved_by or 'N/A' }}</td>
                     <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M:%S') if transaction.created_at else 'N/A' }}</td>

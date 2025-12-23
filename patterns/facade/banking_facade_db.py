@@ -391,6 +391,38 @@ class BankingFacadeDB(Subject):
         
         return True
     
+    def deny_transaction(self, transaction_id: str, approver_role: Role, approver_id: str) -> bool:
+        """Manually deny/reject a pending transaction"""
+        db_transaction = TransactionRepository.get(transaction_id)
+        if not db_transaction:
+            raise InvalidTransactionError(f"Transaction {transaction_id} not found")
+        
+        transaction = TransactionRepository.to_domain_transaction(db_transaction)
+        
+        if transaction.status != TransactionStatus.PENDING:
+            raise InvalidTransactionError("Transaction is not pending approval")
+        
+        # Check if approver has permission
+        if transaction.amount > 75000 and approver_role != Role.ADMIN:
+            raise UnauthorizedAccessError("Only admin can deny transactions over $75,000")
+        elif transaction.amount > 25000 and approver_role not in [Role.EMPLOYEE, Role.ADMIN]:
+            raise UnauthorizedAccessError("Only employees/admins can deny transactions over $25,000")
+        
+        # Update transaction status to rejected in database
+        TransactionRepository.update_status(
+            transaction_id, TransactionStatusEnum.REJECTED, approver_id
+        )
+        transaction.reject()
+        
+        self.notifyObserver(EventType.TRANSACTION_APPROVED, {
+            'transaction_id': transaction_id,
+            'approver': approver_id,
+            'message': f"Transaction {transaction_id} denied by {approver_id}",
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        return True
+    
     # Reporting
     def get_pending_transactions(self) -> List[Transaction]:
         """Get all pending transactions"""

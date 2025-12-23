@@ -46,6 +46,27 @@ def init_admin_controller(transaction_service: TransactionService,
         
         return redirect(url_for('admin.dashboard'))
     
+    @admin_bp.route('/handle_transaction/<transaction_id>', methods=['POST'])
+    @require_role(Role.ADMIN)
+    def handle_transaction(transaction_id):
+        """Handle transaction approval or denial"""
+        try:
+            action = request.form.get('action', '').lower()
+            user_id = get_current_user_id()
+            
+            if action == 'approve':
+                approval_service.approve_transaction(transaction_id, Role.ADMIN, user_id)
+                flash(f'Transaction {transaction_id} approved successfully!', 'success')
+            elif action == 'deny':
+                approval_service.deny_transaction(transaction_id, Role.ADMIN, user_id)
+                flash(f'Transaction {transaction_id} denied successfully!', 'info')
+            else:
+                flash('Invalid action. Please select Approve or Deny.', 'error')
+        except BankingSystemError as e:
+            flash(f'Error: {str(e)}', 'error')
+        
+        return redirect(url_for('admin.dashboard'))
+    
     @admin_bp.route('/financials')
     @require_role(Role.ADMIN)
     def financials():

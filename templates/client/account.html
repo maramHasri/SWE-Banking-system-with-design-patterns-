@@ -2,6 +2,33 @@
 
 {% block title %}Account: {{ account.account_id }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+        display: inline-block;
+    }
+    .status-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .status-approved {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="card">
     <h2>Account: {{ account.account_id }}</h2>
@@ -140,15 +167,22 @@
                         {% set status_value = transaction.status %}
                     {% endif %}
                     {% if status_value == 'completed' %}
-                        {% set status_style = 'background: #d4edda; color: #155724;' %}
+                        {% set status_class = 'status-badge status-completed' %}
+                        {% set status_text = 'Completed' %}
                     {% elif status_value == 'pending' %}
-                        {% set status_style = 'background: #fff3cd; color: #856404;' %}
+                        {% set status_class = 'status-badge status-pending' %}
+                        {% set status_text = 'Pending' %}
                     {% elif status_value == 'approved' %}
-                        {% set status_style = 'background: #d1ecf1; color: #0c5460;' %}
+                        {% set status_class = 'status-badge status-approved' %}
+                        {% set status_text = 'Approved' %}
+                    {% elif status_value == 'rejected' %}
+                        {% set status_class = 'status-badge status-rejected' %}
+                        {% set status_text = 'Rejected' %}
                     {% else %}
-                        {% set status_style = 'background: #f8d7da; color: #721c24;' %}
+                        {% set status_class = 'status-badge status-rejected' %}
+                        {% set status_text = status_value.title() if status_value else 'Unknown' %}
                     {% endif %}
-                  
+                    <span class="{{ status_class }}">{{ status_text }}</span>
                 </td>
                 <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') if transaction.created_at else 'N/A' }}</td>
             </tr>

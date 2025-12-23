@@ -9,6 +9,7 @@ from services.transaction_service import TransactionService
 from services.notification_service import NotificationService
 from security.rbac import get_current_user_role, get_current_user_id
 from utils.exceptions import BankingSystemError
+from datetime import datetime
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/customer')
 
@@ -24,9 +25,21 @@ def init_customer_controller(account_service: AccountService,
         user_id = get_current_user_id()
         accounts = account_service.get_user_accounts(user_id)
         notifications = notification_service.get_notifications(user_id)
+        
+        # Get recent transactions for all user accounts
+        recent_transactions = []
+        for account in accounts:
+            account_transactions = transaction_service.get_account_transactions(account.account_id)
+            recent_transactions.extend(account_transactions)
+        
+        # Sort by date (most recent first) and take last 10
+        recent_transactions.sort(key=lambda t: t.created_at if t.created_at else datetime.min, reverse=True)
+        recent_transactions = recent_transactions[:10]
+        
         return render_template('customer/dashboard.html', 
                              accounts=accounts, 
-                             notifications=notifications[-5:])
+                             notifications=notifications[-5:],
+                             recent_transactions=recent_transactions)
     
     @customer_bp.route('/transaction', methods=['GET', 'POST'])
     def transaction():

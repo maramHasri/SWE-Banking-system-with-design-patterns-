@@ -2681,3 +2681,22 @@
 2025-12-23 05:30:06,714 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:06] "GET /login?role=admin HTTP/1.1" 200 -
 2025-12-23 05:30:44,255 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:44] "[32mPOST /login?role=admin HTTP/1.1[0m" 302 -
 2025-12-23 05:30:44,302 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:44] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 10:53:32,225 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_67C929F9', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_67C929F9 denied by USER_ADMIN1', 'timestamp': '2025-12-23T10:53:32.223076'}
+2025-12-23 10:53:32,228 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 10:53:32] "[32mPOST /admin/handle_transaction/TXN_67C929F9 HTTP/1.1[0m" 302 -
+2025-12-23 10:53:32,279 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 10:53:32] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 11:01:29,371 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:01:29] "GET /client/account/ACC_D7610E34 HTTP/1.1" 200 -
+2025-12-23 11:01:43,953 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:01:43] "GET /client/ HTTP/1.1" 200 -
+2025-12-23 11:02:29,115 - security.account_auth - INFO - Successful account authentication - Account: ACC_3DA9092B
+2025-12-23 11:02:29,117 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:02:29] "[32mPOST /client/ HTTP/1.1[0m" 302 -
+2025-12-23 11:02:29,135 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:02:29] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 11:07:31,642 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Lenovo\\flaskSE\\controllers\\customer_controller.py', reloading
+2025-12-23 11:13:52,879 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_E7BBA1AB', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_E7BBA1AB approved by USER_ADMIN1', 'timestamp': '2025-12-23T11:13:52.877818'}
+2025-12-23 11:13:52,881 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:13:52] "[32mPOST /admin/handle_transaction/TXN_E7BBA1AB HTTP/1.1[0m" 302 -
+2025-12-23 11:13:52,921 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:13:52] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 11:14:02,340 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:14:02] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 11:19:12,010 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:19:12] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 11:20:53,645 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Lenovo\\flaskSE\\patterns\\facade\\banking_facade_db.py', reloading
+2025-12-23 11:40:07,900 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_D1CD1EE8', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_D1CD1EE8 denied by USER_ADMIN1', 'timestamp': '2025-12-23T11:40:07.898740'}
+2025-12-23 11:40:07,901 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:07] "[32mPOST /admin/handle_transaction/TXN_D1CD1EE8 HTTP/1.1[0m" 302 -
+2025-12-23 11:40:07,958 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:07] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 11:40:14,466 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:14] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
