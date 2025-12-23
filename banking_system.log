@@ -2700,3 +2700,26 @@
 2025-12-23 11:40:07,901 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:07] "[32mPOST /admin/handle_transaction/TXN_D1CD1EE8 HTTP/1.1[0m" 302 -
 2025-12-23 11:40:07,958 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:07] "GET /admin/ HTTP/1.1" 200 -
 2025-12-23 11:40:14,466 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 11:40:14] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 12:06:08,250 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_5A9359C6', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_5A9359C6 approved by USER_ADMIN1', 'timestamp': '2025-12-23T12:06:08.249428'}
+2025-12-23 12:06:08,252 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:08] "[32mPOST /admin/handle_transaction/TXN_5A9359C6 HTTP/1.1[0m" 302 -
+2025-12-23 12:06:08,309 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:08] "GET /admin/ HTTP/1.1" 200 -
+2025-12-23 12:06:15,336 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:15] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 12:06:52,567 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:52] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-23 12:06:52,577 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:52] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 12:06:59,339 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:06:59] "GET /employee/ HTTP/1.1" 200 -
+2025-12-23 12:07:02,141 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_CDA2D03D', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_CDA2D03D approved by USER_ADMIN1', 'timestamp': '2025-12-23T12:07:02.141128'}
+2025-12-23 12:07:02,142 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:07:02] "[32mPOST /employee/approve/TXN_CDA2D03D HTTP/1.1[0m" 302 -
+2025-12-23 12:07:02,155 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:07:02] "GET /employee/ HTTP/1.1" 200 -
+2025-12-23 12:07:05,599 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:07:05] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 12:08:59,400 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Lenovo\\flaskSE\\patterns\\facade\\banking_facade_db.py', reloading
+2025-12-23 12:15:29,783 - banking_system - INFO - Approval TXN_8516F40E: Auto-approved by System
+2025-12-23 12:15:29,805 - banking_system - INFO - Audit: transaction_completed - {'transaction_id': 'TXN_8516F40E', 'account_id': 'ACC_3DA9092B', 'target_account_id': 'ACC_13A9A5C4', 'amount': 20000.0, 'type': 'transfer', 'message': 'Transfer of $20000.00 completed', 'timestamp': '2025-12-23T12:15:29.805639'}
+2025-12-23 12:15:29,808 - banking_system - INFO - Audit: balance_changed - {'account_id': 'ACC_3DA9092B', 'new_balance': 2030000.0, 'message': 'Balance updated to $2030000.00', 'timestamp': '2025-12-23T12:15:29.808083'}
+2025-12-23 12:15:29,809 - banking_system - INFO - Audit: balance_changed - {'account_id': 'ACC_13A9A5C4', 'new_balance': 34100.0, 'message': 'Balance updated to $34100.00', 'timestamp': '2025-12-23T12:15:29.809293'}
+2025-12-23 12:15:29,811 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:15:29] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-23 12:15:29,861 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:15:29] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-23 12:16:44,501 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:16:44] "GET /employee/create_account HTTP/1.1" 200 -
+2025-12-23 12:22:07,872 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Lenovo\\flaskSE\\database\\models.py', reloading
+2025-12-23 12:22:37,193 - banking_system - INFO - Audit: account_state_changed - {'account_id': 'ACC_0E138E32', 'state': 'Active', 'message': 'Account ACC_0E138E32 created', 'timestamp': '2025-12-23T12:22:37.192536'}
+2025-12-23 12:22:37,200 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:22:37] "[32mPOST /employee/create_account HTTP/1.1[0m" 302 -
+2025-12-23 12:22:37,322 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 12:22:37] "GET /employee/accounts HTTP/1.1" 200 -

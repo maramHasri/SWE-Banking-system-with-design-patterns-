@@ -31,6 +31,10 @@ class ApprovalService:
         """Approve a transaction"""
         return self.facade.approve_transaction(transaction_id, approver_role, approver_id)
     
+    def complete_transaction(self, transaction_id: str, executor_role: Role, executor_id: str) -> bool:
+        """Execute an approved transaction and mark it as completed"""
+        return self.facade.complete_transaction(transaction_id, executor_role, executor_id)
+    
     def deny_transaction(self, transaction_id: str, approver_role: Role, approver_id: str) -> bool:
         """Deny/reject a transaction"""
         return self.facade.deny_transaction(transaction_id, approver_role, approver_id)

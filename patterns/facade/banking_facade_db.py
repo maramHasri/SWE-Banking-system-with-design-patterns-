@@ -128,7 +128,7 @@ class BankingFacadeDB(Subject):
             if account.deposit(amount):
                 # Update account balance in database
                 AccountRepository.update_balance(account_id, account.balance)
-                # Update transaction status
+                # Update transaction status to COMPLETED after execution
                 TransactionRepository.update_status(
                     transaction_id, TransactionStatusEnum.COMPLETED, "System"
                 )
@@ -198,18 +198,15 @@ class BankingFacadeDB(Subject):
                 if account.withdraw(amount):
                     # Update account balance in database
                     AccountRepository.update_balance(account_id, account.balance)
-                    # Update transaction status
-                    TransactionRepository.update_status(
-                        transaction_id, TransactionStatusEnum.COMPLETED, "System"
-                    )
-                    transaction.complete()
+                    # Transaction is already approved by approval chain
+                    # Status remains APPROVED after execution
                     
-                    self.notifyObserver(EventType.TRANSACTION_COMPLETED, {
+                    self.notifyObserver(EventType.TRANSACTION_APPROVED, {
                         'transaction_id': transaction_id,
                         'account_id': account_id,
                         'amount': amount,
                         'type': 'withdrawal',
-                        'message': f"Withdrawal of ${amount:.2f} completed",
+                        'message': f"Withdrawal of ${amount:.2f} approved and executed",
                         'timestamp': datetime.now().isoformat()
                     })
                     self.notifyObserver(EventType.BALANCE_CHANGED, {
@@ -292,7 +289,7 @@ class BankingFacadeDB(Subject):
                 AccountRepository.update_balance(from_account_id, from_account.balance)
                 AccountRepository.update_balance(to_account_id, to_account.balance)
                 
-                # Update transaction status
+                # Update transaction status to COMPLETED after execution
                 TransactionRepository.update_status(
                     transaction_id, TransactionStatusEnum.COMPLETED, "System"
                 )
@@ -354,33 +351,39 @@ class BankingFacadeDB(Subject):
         elif transaction.amount > 25000 and approver_role not in [Role.EMPLOYEE, Role.ADMIN]:
             raise UnauthorizedAccessError("Only employees/admins can approve transactions over $25,000")
         
-        # Update transaction status in database
-        TransactionRepository.update_status(
-            transaction_id, TransactionStatusEnum.APPROVED, approver_id
-        )
-        transaction.approve(approver_id)
-        
-        # Execute the transaction
+        # Execute the transaction first
         account = self.get_account(transaction.account_id)
         
-        if transaction.transaction_type == TransactionType.DEPOSIT:
-            account.deposit(transaction.amount)
-            AccountRepository.update_balance(transaction.account_id, account.balance)
-            TransactionRepository.update_status(transaction_id, TransactionStatusEnum.COMPLETED)
+        try:
+            if transaction.transaction_type == TransactionType.DEPOSIT:
+                account.deposit(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+            elif transaction.transaction_type == TransactionType.WITHDRAWAL:
+                account.withdraw(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+            elif transaction.transaction_type == TransactionType.TRANSFER:
+                target_account = self.get_account(transaction.target_account_id)
+                account.withdraw(transaction.amount)
+                target_account.deposit(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+                AccountRepository.update_balance(transaction.target_account_id, target_account.balance)
+            
+            # Update transaction status in database to APPROVED first
+            TransactionRepository.update_status(
+                transaction_id, TransactionStatusEnum.APPROVED, approver_id
+            )
+            transaction.approve(approver_id)
+            
+            # Then update to COMPLETED after execution
+            TransactionRepository.update_status(
+                transaction_id, TransactionStatusEnum.COMPLETED, approver_id
+            )
             transaction.complete()
-        elif transaction.transaction_type == TransactionType.WITHDRAWAL:
-            account.withdraw(transaction.amount)
-            AccountRepository.update_balance(transaction.account_id, account.balance)
-            TransactionRepository.update_status(transaction_id, TransactionStatusEnum.COMPLETED)
-            transaction.complete()
-        elif transaction.transaction_type == TransactionType.TRANSFER:
-            target_account = self.get_account(transaction.target_account_id)
-            account.withdraw(transaction.amount)
-            target_account.deposit(transaction.amount)
-            AccountRepository.update_balance(transaction.account_id, account.balance)
-            AccountRepository.update_balance(transaction.target_account_id, target_account.balance)
-            TransactionRepository.update_status(transaction_id, TransactionStatusEnum.COMPLETED)
-            transaction.complete()
+        except (InsufficientFundsError, FrozenAccountError, AccountNotFoundError) as e:
+            # If execution fails, reject the transaction
+            TransactionRepository.update_status(transaction_id, TransactionStatusEnum.REJECTED, approver_id)
+            transaction.reject()
+            raise
         
         self.notifyObserver(EventType.TRANSACTION_APPROVED, {
             'transaction_id': transaction_id,
@@ -390,6 +393,52 @@ class BankingFacadeDB(Subject):
         })
         
         return True
+    
+    def complete_transaction(self, transaction_id: str, executor_role: Role, executor_id: str) -> bool:
+        """Execute an approved transaction and mark it as completed"""
+        db_transaction = TransactionRepository.get(transaction_id)
+        if not db_transaction:
+            raise InvalidTransactionError(f"Transaction {transaction_id} not found")
+        
+        transaction = TransactionRepository.to_domain_transaction(db_transaction)
+        
+        if transaction.status != TransactionStatus.APPROVED:
+            raise InvalidTransactionError("Transaction must be APPROVED before it can be completed")
+        
+        # Execute the transaction
+        account = self.get_account(transaction.account_id)
+        
+        try:
+            if transaction.transaction_type == TransactionType.DEPOSIT:
+                account.deposit(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+            elif transaction.transaction_type == TransactionType.WITHDRAWAL:
+                account.withdraw(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+            elif transaction.transaction_type == TransactionType.TRANSFER:
+                target_account = self.get_account(transaction.target_account_id)
+                account.withdraw(transaction.amount)
+                target_account.deposit(transaction.amount)
+                AccountRepository.update_balance(transaction.account_id, account.balance)
+                AccountRepository.update_balance(transaction.target_account_id, target_account.balance)
+            
+            # Update transaction status to COMPLETED after execution
+            TransactionRepository.update_status(
+                transaction_id, TransactionStatusEnum.COMPLETED, executor_id
+            )
+            transaction.complete()
+            
+            self.notifyObserver(EventType.TRANSACTION_COMPLETED, {
+                'transaction_id': transaction_id,
+                'executor': executor_id,
+                'message': f"Transaction {transaction_id} executed and completed by {executor_id}",
+                'timestamp': datetime.now().isoformat()
+            })
+            
+            return True
+        except (InsufficientFundsError, FrozenAccountError, AccountNotFoundError) as e:
+            # If execution fails, keep transaction in APPROVED status
+            raise
     
     def deny_transaction(self, transaction_id: str, approver_role: Role, approver_id: str) -> bool:
         """Manually deny/reject a pending transaction"""

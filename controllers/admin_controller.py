@@ -49,19 +49,22 @@ def init_admin_controller(transaction_service: TransactionService,
     @admin_bp.route('/handle_transaction/<transaction_id>', methods=['POST'])
     @require_role(Role.ADMIN)
     def handle_transaction(transaction_id):
-        """Handle transaction approval or denial"""
+        """Handle transaction approval, completion, or denial"""
         try:
             action = request.form.get('action', '').lower()
             user_id = get_current_user_id()
             
             if action == 'approve':
                 approval_service.approve_transaction(transaction_id, Role.ADMIN, user_id)
-                flash(f'Transaction {transaction_id} approved successfully!', 'success')
+                flash(f'Transaction {transaction_id} approved and completed successfully!', 'success')
+            elif action == 'complete':
+                approval_service.complete_transaction(transaction_id, Role.ADMIN, user_id)
+                flash(f'Transaction {transaction_id} completed successfully!', 'success')
             elif action == 'deny':
                 approval_service.deny_transaction(transaction_id, Role.ADMIN, user_id)
                 flash(f'Transaction {transaction_id} denied successfully!', 'info')
             else:
-                flash('Invalid action. Please select Approve or Deny.', 'error')
+                flash('Invalid action. Please select Approve, Complete, or Deny.', 'error')
         except BankingSystemError as e:
             flash(f'Error: {str(e)}', 'error')
         

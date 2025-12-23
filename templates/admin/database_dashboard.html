@@ -214,6 +214,8 @@
                             {% set status_class = 'status-badge status-pending' %}
                         {% elif status_value == 'approved' %}
                             {% set status_class = 'status-badge status-approved' %}
+                        {% elif status_value == 'rejected' %}
+                            {% set status_class = 'status-badge status-rejected' %}
                         {% else %}
                             {% set status_class = 'status-badge status-rejected' %}
                         {% endif %}
