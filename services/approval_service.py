@@ -4,13 +4,13 @@ Approval service for transaction approvals
 from typing import List
 from domain.transaction.transaction import Transaction
 from domain.roles.role import Role
-from patterns.facade.banking_facade import BankingFacade
+from patterns.facade.banking_facade_db import BankingFacadeDB
 
 
 class ApprovalService:
     """Service for transaction approvals"""
     
-    def __init__(self, banking_facade: BankingFacade):
+    def __init__(self, banking_facade: BankingFacadeDB):
         self.facade = banking_facade
     
     def get_pending_approvals(self, user_role: Role) -> List[Transaction]:

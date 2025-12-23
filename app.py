@@ -4,7 +4,7 @@ Flask Banking System - Main Application Entry Point
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-from config import SECRET_KEY, USE_POSTGRESQL
+from config import SECRET_KEY
 from domain.roles.role import Role
 from utils.exceptions import BankingSystemError
 
@@ -34,28 +34,23 @@ app.secret_key = SECRET_KEY
 # Database & Facade Initialization
 # --------------------------------------------------
 
-if USE_POSTGRESQL:
-    try:
-        print("🔌 Connecting to PostgreSQL...")
+# Always use database facade (BankingFacadeDB) for persistent storage
+# The in-memory facade (BankingFacade) has been removed
+try:
+    print("🔌 Connecting to PostgreSQL...")
 
-        from database.db import init_db
-        from patterns.facade.banking_facade_db import BankingFacadeDB
+    from database.db import init_db
+    from patterns.facade.banking_facade_db import BankingFacadeDB
 
-        init_db(app)
-        banking_facade = BankingFacadeDB()
+    init_db(app)
+    banking_facade = BankingFacadeDB()
 
-        print("✅ PostgreSQL connected successfully")
+    print("✅ PostgreSQL connected successfully")
 
-    except Exception as e:
-        print(f"⚠️ PostgreSQL initialization failed: {e}")
-        print("⚠️ Falling back to in-memory storage")
-
-        from patterns.facade.banking_facade import BankingFacade
-        banking_facade = BankingFacade()
-else:
-    print("ℹ️ Using in-memory storage")
-    from patterns.facade.banking_facade import BankingFacade
-    banking_facade = BankingFacade()
+except Exception as e:
+    print(f"❌ PostgreSQL initialization failed: {e}")
+    print("❌ Database connection is required. Please check your database configuration.")
+    raise
 
 
 # --------------------------------------------------
@@ -63,7 +58,7 @@ else:
 # --------------------------------------------------
 
 audit_observer = AuditLogObserver()
-banking_facade.attach(audit_observer)
+banking_facade.addObserver(audit_observer)
 
 
 # --------------------------------------------------
@@ -141,76 +136,62 @@ def login():
                     flash('Email or phone number is required for employee/admin login.', 'error')
                     return render_template('login.html', role=role_str)
 
-            if USE_POSTGRESQL:
-                try:
-                    from database.repository import UserRepository
-                    from security.password import verify_password
+            # Database is always required - use UserRepository for authentication
+            try:
+                from database.repository import UserRepository
+                from security.password import verify_password
 
-                    user = UserRepository.get_by_username(username)
-                    
-                    # For employees and admins, verify authentication
-                    if role in [Role.EMPLOYEE, Role.ADMIN]:
-                        if not user:
-                            flash('Invalid username, email/phone, or password.', 'error')
-                            return render_template('login.html', role=role_str)
-                        
-                        # Verify email or phone matches (handle phone with/without + prefix)
-                        email_match = user.email and user.email.lower() == email_or_phone.lower()
-                        phone_match = user.phone and (user.phone == email_or_phone or 
-                                                      user.phone == f"+{email_or_phone}" or
-                                                      user.phone.lstrip('+') == email_or_phone.lstrip('+'))
-                        
-                        if not email_match and not phone_match:
-                            flash('Invalid username, email/phone, or password.', 'error')
-                            return render_template('login.html', role=role_str)
-                        
-                        # Verify password
-                        if not verify_password(user.password_hash, password):
-                            flash('Invalid username, email/phone, or password.', 'error')
-                            return render_template('login.html', role=role_str)
-                        
-                        # Verify role matches
-                        if user.role.value != role.value:
-                            flash(f'User {username} is not registered as {role.value}.', 'error')
-                            return render_template('login.html', role=role_str)
-                        
-                        # Check if user is active
-                        if not user.is_active:
-                            flash('Your account has been deactivated. Please contact an administrator.', 'error')
-                            return render_template('login.html', role=role_str)
-                    
-                    # For customers, create user if doesn't exist (backward compatibility)
-                    elif role == Role.CUSTOMER:
-                        if not user:
-                            user = UserRepository.create(
-                                user_id=f"USER_{username.upper()}",
-                                username=username,
-                                role=role
-                            )
-                        elif user.role.value != role.value:
-                            UserRepository.update_role(user.user_id, role)
-
-                    session['user_id'] = user.user_id
-                    session['username'] = user.username
-                    session['user_role'] = user.role.value
-
-                except Exception as e:
-                    # Only allow fallback for customers
-                    if role == Role.CUSTOMER:
-                        session['user_id'] = f"USER_{username.upper()}"
-                        session['username'] = username
-                        session['user_role'] = role.value
-                    else:
-                        flash(f'Login failed: {str(e)}', 'error')
-                        return render_template('login.html', role=role_str)
-            else:
-                # Fallback for non-PostgreSQL (shouldn't happen in production)
+                user = UserRepository.get_by_username(username)
+                
+                # For employees and admins, verify authentication
                 if role in [Role.EMPLOYEE, Role.ADMIN]:
-                    flash('Database connection required for employee/admin login.', 'error')
-                    return render_template('login.html', role=role_str)
-                session['user_id'] = f"USER_{username.upper()}"
-                session['username'] = username
-                session['user_role'] = role.value
+                    if not user:
+                        flash('Invalid username, email/phone, or password.', 'error')
+                        return render_template('login.html', role=role_str)
+                    
+                    # Verify email or phone matches (handle phone with/without + prefix)
+                    email_match = user.email and user.email.lower() == email_or_phone.lower()
+                    phone_match = user.phone and (user.phone == email_or_phone or 
+                                                  user.phone == f"+{email_or_phone}" or
+                                                  user.phone.lstrip('+') == email_or_phone.lstrip('+'))
+                    
+                    if not email_match and not phone_match:
+                        flash('Invalid username, email/phone, or password.', 'error')
+                        return render_template('login.html', role=role_str)
+                    
+                    # Verify password
+                    if not verify_password(user.password_hash, password):
+                        flash('Invalid username, email/phone, or password.', 'error')
+                        return render_template('login.html', role=role_str)
+                    
+                    # Verify role matches
+                    if user.role.value != role.value:
+                        flash(f'User {username} is not registered as {role.value}.', 'error')
+                        return render_template('login.html', role=role_str)
+                    
+                    # Check if user is active
+                    if not user.is_active:
+                        flash('Your account has been deactivated. Please contact an administrator.', 'error')
+                        return render_template('login.html', role=role_str)
+                
+                # For customers, create user if doesn't exist (backward compatibility)
+                elif role == Role.CUSTOMER:
+                    if not user:
+                        user = UserRepository.create(
+                            user_id=f"USER_{username.upper()}",
+                            username=username,
+                            role=role
+                        )
+                    elif user.role.value != role.value:
+                        UserRepository.update_role(user.user_id, role)
+
+                session['user_id'] = user.user_id
+                session['username'] = user.username
+                session['user_role'] = user.role.value
+
+            except Exception as e:
+                flash(f'Login failed: {str(e)}. Database connection required.', 'error')
+                return render_template('login.html', role=role_str)
 
             banking_facade.set_current_user(session['user_id'])
 

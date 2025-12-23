@@ -2611,3 +2611,73 @@
 2025-12-21 19:40:54,750 - werkzeug - INFO - 127.0.0.1 - - [21/Dec/2025 19:40:54] "[32mPOST /employee/create_account HTTP/1.1[0m" 302 -
 2025-12-21 19:40:54,750 - werkzeug - INFO - 127.0.0.1 - - [21/Dec/2025 19:40:54] "[32mPOST /employee/create_account HTTP/1.1[0m" 302 -
 2025-12-21 19:41:06,781 - werkzeug - INFO - 127.0.0.1 - - [21/Dec/2025 19:41:06] "GET /admin/financials HTTP/1.1" 200 -
+2025-12-22 12:27:49,170 - banking_system - INFO - Audit: account_state_changed - {'account_id': 'ACC_E5950CCE', 'state': 'Active', 'changed_by': 'employee', 'message': 'Account ACC_E5950CCE state changed to active', 'timestamp': '2025-12-22T12:27:49.166346'}
+2025-12-22 12:27:49,173 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:27:49] "[32mPOST /employee/account/ACC_E5950CCE/change_state HTTP/1.1[0m" 302 -
+2025-12-22 12:27:49,244 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:27:49] "GET /employee/accounts HTTP/1.1" 200 -
+2025-12-22 12:29:30,800 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:29:30] "GET /client/account/ACC_13A9A5C4 HTTP/1.1" 200 -
+2025-12-22 12:29:36,331 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:29:36] "GET /client/ HTTP/1.1" 200 -
+2025-12-22 12:30:34,172 - security.account_auth - INFO - Successful account authentication - Account: ACC_752F9F47
+2025-12-22 12:30:34,176 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:30:34] "[32mPOST /client/ HTTP/1.1[0m" 302 -
+2025-12-22 12:30:34,197 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:30:34] "GET /client/account/ACC_752F9F47 HTTP/1.1" 200 -
+2025-12-22 12:31:02,496 - banking_system - INFO - Approval TXN_0694F684: Auto-approved by System
+2025-12-22 12:31:02,505 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:02] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 12:31:02,523 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:02] "GET /client/account/ACC_752F9F47 HTTP/1.1" 200 -
+2025-12-22 12:31:20,484 - banking_system - INFO - Approval TXN_DC27EDA6: Auto-approved by System
+2025-12-22 12:31:20,497 - banking_system - INFO - Audit: transaction_completed - {'transaction_id': 'TXN_DC27EDA6', 'account_id': 'ACC_752F9F47', 'amount': 15.0, 'type': 'deposit', 'message': 'Deposit of $15.00 completed', 'timestamp': '2025-12-22T12:31:20.497823'}
+2025-12-22 12:31:20,499 - banking_system - INFO - Audit: balance_changed - {'account_id': 'ACC_752F9F47', 'new_balance': 300.0, 'message': 'Balance updated to $300.00', 'timestamp': '2025-12-22T12:31:20.499234'}
+2025-12-22 12:31:20,501 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:20] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 12:31:20,517 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:20] "GET /client/account/ACC_752F9F47 HTTP/1.1" 200 -
+2025-12-22 12:31:35,673 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:35] "[32mGET /client/logout HTTP/1.1[0m" 302 -
+2025-12-22 12:31:35,679 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 12:31:35] "GET /client/ HTTP/1.1" 200 -
+2025-12-22 13:28:24,040 - security.account_auth - WARNING - Failed login attempt: Invalid account ID or IBAN - Account: ACC_13A9A5C4, IBAN: US35***
+2025-12-22 13:28:24,049 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:28:24] "POST /client/ HTTP/1.1" 200 -
+2025-12-22 13:28:53,166 - security.account_auth - INFO - Successful account authentication - Account: ACC_3DA9092B
+2025-12-22 13:28:53,169 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:28:53] "[32mPOST /client/ HTTP/1.1[0m" 302 -
+2025-12-22 13:28:53,191 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:28:53] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:30:13,449 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:30:13] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 13:30:13,466 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:30:13] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:30:30,529 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:30:30] "[32mGET /admin/financials HTTP/1.1[0m" 302 -
+2025-12-22 13:30:30,552 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:30:30] "GET /employee/ HTTP/1.1" 200 -
+2025-12-22 13:30:37,461 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:30:37] "GET /admin/financials HTTP/1.1" 200 -
+2025-12-22 13:30:44,295 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:30:44] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 13:30:47,667 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:30:47] "[32mPOST /admin/approve/TXN_096FC63B HTTP/1.1[0m" 302 -
+2025-12-22 13:30:47,712 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:30:47] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 13:31:25,982 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:31:25] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:31:53,209 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:31:53] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 13:31:53,220 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:31:53] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:31:58,165 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:31:58] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 13:47:49,962 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:47:49] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 13:47:49,978 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:47:49] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:47:57,848 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:47:57] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 13:48:19,700 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:48:19] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 13:48:19,712 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:48:19] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 13:48:26,520 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:48:26] "GET /employee/ HTTP/1.1" 200 -
+2025-12-22 13:56:23,080 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:56:23] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 13:58:02,672 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:58:02] "[32mPOST /employee/approve/TXN_F3DCF5AB HTTP/1.1[0m" 302 -
+2025-12-22 13:58:02,684 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 13:58:02] "GET /employee/ HTTP/1.1" 200 -
+2025-12-22 13:58:14,137 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 13:58:14] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 14:36:02,275 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 14:36:02] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-22 14:36:02,289 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 14:36:02] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 14:36:14,491 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 14:36:14] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 14:36:18,003 - banking_system - INFO - Audit: transaction_approved - {'transaction_id': 'TXN_21D5FB4C', 'approver': 'USER_ADMIN1', 'message': 'Transaction TXN_21D5FB4C approved by USER_ADMIN1', 'timestamp': '2025-12-22T14:36:18.002729'}
+2025-12-22 14:36:18,005 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 14:36:18] "[32mPOST /admin/approve/TXN_21D5FB4C HTTP/1.1[0m" 302 -
+2025-12-22 14:36:18,061 - werkzeug - INFO - 10.2.0.2 - - [22/Dec/2025 14:36:18] "GET /admin/ HTTP/1.1" 200 -
+2025-12-22 14:36:23,493 - werkzeug - INFO - 127.0.0.1 - - [22/Dec/2025 14:36:23] "GET /client/account/ACC_3DA9092B HTTP/1.1" 200 -
+2025-12-22 14:50:06,778 - werkzeug - INFO -  * Detected change in 'C:\\Users\\Lenovo\\flaskSE\\patterns\\decorator\\account_decorator.py', reloading
+2025-12-23 05:28:17,194 - banking_system - INFO - Approval TXN_EA9B63C8: Auto-approved by System
+2025-12-23 05:28:17,209 - banking_system - INFO - Audit: transaction_completed - {'transaction_id': 'TXN_EA9B63C8', 'account_id': 'ACC_D7610E34', 'amount': 463.0, 'type': 'withdrawal', 'message': 'Withdrawal of $463.00 completed', 'timestamp': '2025-12-23T05:28:17.209830'}
+2025-12-23 05:28:17,210 - banking_system - INFO - Audit: balance_changed - {'account_id': 'ACC_D7610E34', 'new_balance': 5000.13, 'message': 'Balance updated to $5000.13', 'timestamp': '2025-12-23T05:28:17.210503'}
+2025-12-23 05:28:17,213 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:28:17] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-23 05:28:17,228 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:28:17] "GET /client/account/ACC_D7610E34 HTTP/1.1" 200 -
+2025-12-23 05:28:46,946 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:28:46] "GET /employee/accounts HTTP/1.1" 200 -
+2025-12-23 05:29:01,907 - banking_system - INFO - Audit: account_state_changed - {'account_id': 'ACC_D7610E34', 'state': 'Frozen', 'changed_by': 'employee', 'message': 'Account ACC_D7610E34 state changed to frozen', 'timestamp': '2025-12-23T05:29:01.907101'}
+2025-12-23 05:29:01,910 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:29:01] "[32mPOST /employee/account/ACC_D7610E34/change_state HTTP/1.1[0m" 302 -
+2025-12-23 05:29:02,160 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:29:02] "GET /employee/accounts HTTP/1.1" 200 -
+2025-12-23 05:29:43,332 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:29:43] "GET /client/account/ACC_D7610E34 HTTP/1.1" 200 -
+2025-12-23 05:29:53,711 - banking_system - INFO - Approval TXN_DE60F477: Auto-approved by System
+2025-12-23 05:29:53,715 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:29:53] "[32mPOST /client/transaction HTTP/1.1[0m" 302 -
+2025-12-23 05:29:53,734 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:29:53] "GET /client/account/ACC_D7610E34 HTTP/1.1" 200 -
+2025-12-23 05:30:04,281 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:04] "GET / HTTP/1.1" 200 -
+2025-12-23 05:30:06,714 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:06] "GET /login?role=admin HTTP/1.1" 200 -
+2025-12-23 05:30:44,255 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:44] "[32mPOST /login?role=admin HTTP/1.1[0m" 302 -
+2025-12-23 05:30:44,302 - werkzeug - INFO - 127.0.0.1 - - [23/Dec/2025 05:30:44] "GET /admin/ HTTP/1.1" 200 -

@@ -3,14 +3,14 @@ Reporting service for generating reports
 """
 from typing import List, Dict, Any
 from datetime import datetime
-from patterns.facade.banking_facade import BankingFacade
+from patterns.facade.banking_facade_db import BankingFacadeDB
 from domain.transaction.transaction import Transaction
 
 
 class ReportService:
     """Service for generating reports"""
     
-    def __init__(self, banking_facade: BankingFacade):
+    def __init__(self, banking_facade: BankingFacadeDB):
         self.facade = banking_facade
     
     def get_daily_transaction_report(self, date: datetime = None) -> Dict[str, Any]:

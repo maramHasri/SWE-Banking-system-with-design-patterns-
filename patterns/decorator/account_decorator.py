@@ -107,7 +107,7 @@ class BusinessLoanExtension(AccountFeature):
     
     def get_feature_name(self) -> str:
         return f"Business Loan Extension (${self.extension_amount:.2f})"
-    
+    """مربط الفرس"""
     def get_available_credit(self) -> float:
         """Get available credit"""
         return self.extension_amount - abs(self._account.balance)

@@ -25,7 +25,7 @@ A professional Flask-based Banking System demonstrating structural and behaviora
 ### Design Patterns Implemented
 
 #### Structural Patterns
-1. **Facade**: Unified interface (`BankingFacade`) for all banking operations
+1. **Facade**: Unified interface (`BankingFacadeDB`) for all banking operations with persistent storage
 2. **Composite**: Hierarchical account structures (`AccountComponent`, `AccountComposite`, `AccountLeaf`)
 3. **Decorator**: Dynamic account features (Overdraft Protection, Investment Bonus, Premium Savings, Business Loan Extension)
 4. **Adapter**: External payment gateway integration (`PaymentGatewayAdapter`, `LegacyBankingAdapter`)
@@ -145,13 +145,14 @@ The system now supports **PostgreSQL** for persistent storage!
 5. Run app: `python app.py`
 
 ### Configuration:
-- **PostgreSQL**: Set `USE_POSTGRESQL = True` in `config.py`
-- **In-Memory**: Set `USE_POSTGRESQL = False` (default fallback)
+- **PostgreSQL**: Required - Set `USE_POSTGRESQL = True` in `config.py`
+- The system uses `BankingFacadeDB` for all operations with persistent storage
+- Database connection is mandatory - the system will not start without it
 
 The system automatically:
 - Creates tables on first run
-- Falls back to in-memory storage if PostgreSQL is unavailable
 - Uses database for all persistent operations
+- All data is stored in PostgreSQL (no in-memory fallback)
 
 ## Notes
 

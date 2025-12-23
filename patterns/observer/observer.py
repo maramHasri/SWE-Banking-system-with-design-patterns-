@@ -30,17 +30,17 @@ class Subject(ABC):
     def __init__(self):
         self._observers: List[Observer] = []
     
-    def attach(self, observer: Observer):
+    def addObserver(self, observer: Observer):
         """Attach an observer"""
         if observer not in self._observers:
             self._observers.append(observer)
     
-    def detach(self, observer: Observer):
+    def removeObserver(self, observer: Observer):
         """Detach an observer"""
         if observer in self._observers:
             self._observers.remove(observer)
     
-    def notify(self, event_type: EventType, data: Dict[str, Any]):
+    def notifyObserver(self, event_type: EventType, data: Dict[str, Any]):
         """Notify all observers"""
         for observer in self._observers:
             observer.update(event_type, data)

@@ -7,7 +7,7 @@ from domain.account.account import Account
 from domain.account.account_type import AccountType
 from domain.transaction.transaction import Transaction, TransactionType, TransactionStatus
 from domain.roles.role import Role
-from domain.state.account_state import ActiveState, FrozenState, SuspendedState, ClosedState
+from patterns.state.account_state import ActiveState, FrozenState, SuspendedState, ClosedState
 from patterns.observer.observer import Subject, EventType
 from patterns.chain.approval_handler import ApprovalChain
 from database.repository import AccountRepository, TransactionRepository, FinancialsRepository
@@ -45,7 +45,7 @@ class BankingFacadeDB(Subject):
         # Convert to domain object
         account = AccountRepository.to_domain_account(db_account)
         
-        self.notify(EventType.ACCOUNT_STATE_CHANGED, {
+        self.notifyObserver(EventType.ACCOUNT_STATE_CHANGED, {
             'account_id': account_id,
             'state': account.get_state_name(),
             'message': f"Account {account_id} created",
@@ -92,7 +92,7 @@ class BankingFacadeDB(Subject):
         # Reload account to get updated state
         account = self.get_account(account_id)
         
-        self.notify(EventType.ACCOUNT_STATE_CHANGED, {
+        self.notifyObserver(EventType.ACCOUNT_STATE_CHANGED, {
             'account_id': account_id,
             'state': account.get_state_name(),
             'changed_by': user_role.value,
@@ -134,7 +134,7 @@ class BankingFacadeDB(Subject):
                 )
                 transaction.complete()
                 
-                self.notify(EventType.TRANSACTION_COMPLETED, {
+                self.notifyObserver(EventType.TRANSACTION_COMPLETED, {
                     'transaction_id': transaction_id,
                     'account_id': account_id,
                     'amount': amount,
@@ -142,7 +142,7 @@ class BankingFacadeDB(Subject):
                     'message': f"Deposit of ${amount:.2f} completed",
                     'timestamp': datetime.now().isoformat()
                 })
-                self.notify(EventType.BALANCE_CHANGED, {
+                self.notifyObserver(EventType.BALANCE_CHANGED, {
                     'account_id': account_id,
                     'new_balance': account.balance,
                     'message': f"Balance updated to ${account.balance:.2f}",
@@ -204,7 +204,7 @@ class BankingFacadeDB(Subject):
                     )
                     transaction.complete()
                     
-                    self.notify(EventType.TRANSACTION_COMPLETED, {
+                    self.notifyObserver(EventType.TRANSACTION_COMPLETED, {
                         'transaction_id': transaction_id,
                         'account_id': account_id,
                         'amount': amount,
@@ -212,7 +212,7 @@ class BankingFacadeDB(Subject):
                         'message': f"Withdrawal of ${amount:.2f} completed",
                         'timestamp': datetime.now().isoformat()
                     })
-                    self.notify(EventType.BALANCE_CHANGED, {
+                    self.notifyObserver(EventType.BALANCE_CHANGED, {
                         'account_id': account_id,
                         'new_balance': account.balance,
                         'message': f"Balance updated to ${account.balance:.2f}",
@@ -301,7 +301,7 @@ class BankingFacadeDB(Subject):
                 # Commit all changes atomically
                 db.session.commit()
                 
-                self.notify(EventType.TRANSACTION_COMPLETED, {
+                self.notifyObserver(EventType.TRANSACTION_COMPLETED, {
                     'transaction_id': transaction_id,
                     'account_id': from_account_id,
                     'target_account_id': to_account_id,
@@ -310,13 +310,13 @@ class BankingFacadeDB(Subject):
                     'message': f"Transfer of ${amount:.2f} completed",
                     'timestamp': datetime.now().isoformat()
                 })
-                self.notify(EventType.BALANCE_CHANGED, {
+                self.notifyObserver(EventType.BALANCE_CHANGED, {
                     'account_id': from_account_id,
                     'new_balance': from_account.balance,
                     'message': f"Balance updated to ${from_account.balance:.2f}",
                     'timestamp': datetime.now().isoformat()
                 })
-                self.notify(EventType.BALANCE_CHANGED, {
+                self.notifyObserver(EventType.BALANCE_CHANGED, {
                     'account_id': to_account_id,
                     'new_balance': to_account.balance,
                     'message': f"Balance updated to ${to_account.balance:.2f}",
@@ -382,7 +382,7 @@ class BankingFacadeDB(Subject):
             TransactionRepository.update_status(transaction_id, TransactionStatusEnum.COMPLETED)
             transaction.complete()
         
-        self.notify(EventType.TRANSACTION_APPROVED, {
+        self.notifyObserver(EventType.TRANSACTION_APPROVED, {
             'transaction_id': transaction_id,
             'approver': approver_id,
             'message': f"Transaction {transaction_id} approved by {approver_id}",
@@ -419,4 +419,3 @@ class BankingFacadeDB(Subject):
     def set_current_user(self, user_id: str):
         """Set current user for authorization checks"""
         self._current_user_id = user_id
-

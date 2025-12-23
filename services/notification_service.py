@@ -3,16 +3,16 @@ Notification service
 """
 from typing import List, Dict, Any
 from patterns.observer.observer import NotificationObserver, Observer
-from patterns.facade.banking_facade import BankingFacade
+from patterns.facade.banking_facade_db import BankingFacadeDB
 
 
 class NotificationService:
     """Service for managing notifications"""
     
-    def __init__(self, banking_facade: BankingFacade):
+    def __init__(self, banking_facade: BankingFacadeDB):
         self.facade = banking_facade
         self.notification_observer = NotificationObserver()
-        self.facade.attach(self.notification_observer)
+        self.facade.addObserver(self.notification_observer)
     
     def get_notifications(self, user_id: str = None) -> List[Dict[str, Any]]:
         """Get notifications for a user"""

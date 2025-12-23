@@ -4,14 +4,14 @@ Transaction service - business logic for transactions
 from typing import List
 from domain.transaction.transaction import Transaction
 from domain.roles.role import Role
-from patterns.facade.banking_facade import BankingFacade
+from patterns.facade.banking_facade_db import BankingFacadeDB
 from utils.exceptions import InvalidTransactionError
 
 
 class TransactionService:
     """Service for transaction operations"""
     
-    def __init__(self, banking_facade: BankingFacade):
+    def __init__(self, banking_facade: BankingFacadeDB):
         self.facade = banking_facade
     
     def deposit(self, account_id: str, amount: float, description: str = "",

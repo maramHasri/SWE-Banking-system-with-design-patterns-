@@ -4,7 +4,7 @@ Account domain model
 from typing import Optional
 from datetime import datetime
 from domain.account.account_type import AccountType
-from domain.state.account_state import AccountState, ActiveState
+from patterns.state.account_state import AccountState, ActiveState
 from utils.exceptions import InvalidStateTransitionError, InsufficientFundsError
 
 
@@ -27,7 +27,7 @@ class Account:
     def set_state(self, new_state: AccountState):
         """Change account state"""
         if self.is_closed:
-            from domain.state.account_state import ClosedState
+            from patterns.state.account_state import ClosedState
             if not isinstance(new_state, ClosedState):
                 raise InvalidStateTransitionError("Cannot change state of closed account")
         self.state = new_state
@@ -82,7 +82,7 @@ class Account:
     
     def close(self):
         """Close the account"""
-        from domain.state.account_state import ClosedState
+        from patterns.state.account_state import ClosedState
         self.set_state(ClosedState())
         self.is_closed = True
     

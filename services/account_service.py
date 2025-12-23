@@ -5,14 +5,14 @@ from typing import List, Optional
 from domain.account.account import Account
 from domain.account.account_type import AccountType
 from domain.roles.role import Role
-from patterns.facade.banking_facade import BankingFacade
+from patterns.facade.banking_facade_db import BankingFacadeDB
 from utils.exceptions import AccountNotFoundError, UnauthorizedOperationError
 
 
 class AccountService:
     """Service for account management"""
     
-    def __init__(self, banking_facade: BankingFacade):
+    def __init__(self, banking_facade: BankingFacadeDB):
         self.facade = banking_facade
     
     def create_account(self, account_type: AccountType, owner_id: str, 

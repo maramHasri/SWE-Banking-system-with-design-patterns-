@@ -14,7 +14,7 @@ from database.models import (
 from domain.account.account import Account
 from domain.account.account_type import AccountType
 from domain.transaction.transaction import Transaction, TransactionType, TransactionStatus
-from domain.state.account_state import ActiveState, FrozenState, SuspendedState, ClosedState
+from patterns.state.account_state import ActiveState, FrozenState, SuspendedState, ClosedState
 from domain.roles.role import Role
 from utils.exceptions import AccountNotFoundError
 from datetime import datetime
